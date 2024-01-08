@@ -6,8 +6,8 @@ resource "aws_cloudwatch_log_group" "this" {
 
 # IAMロールとIAMポリシーを作成するためのリソース
 resource "aws_iam_policy" "this" {
-  name        = "terraform-lambda-${var.name}-policy"
-  path        = "/"
+  name   = "terraform-lambda-${var.name}-policy"
+  path   = "/"
   policy = jsonencode(var.iam_policy)
 }
 
@@ -47,5 +47,5 @@ resource "aws_lambda_function" "this" {
   handler          = "${var.function_name}.lambda_handler"
   runtime          = "python3.12"
   source_code_hash = data.archive_file.this.output_base64sha256
-  timeout = var.timeout
+  timeout          = var.timeout
 }
