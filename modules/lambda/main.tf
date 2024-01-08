@@ -29,6 +29,16 @@ resource "aws_iam_policy" "this" {
           "Resource" : [
             "arn:aws:logs:ap-northeast-1:${data.aws_caller_identity.this.account_id}:log-group:/aws/lambda/${var.name}:*"
           ]
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+            "ssm:GetParameter",
+            "ssm:GetParameters"
+          ],
+          "Resource": [
+            "arn:aws:ssm:ap-northeast-1:${data.aws_caller_identity.this.account_id}:parameter/*"
+          ]
         }
       ],
       "Version" : "2012-10-17"
@@ -72,4 +82,5 @@ resource "aws_lambda_function" "this" {
   handler          = "${var.function_name}.lambda_handler"
   runtime          = "python3.12"
   source_code_hash = data.archive_file.this.output_base64sha256
+  timeout = 60
 }
