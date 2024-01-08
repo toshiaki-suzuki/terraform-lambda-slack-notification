@@ -1,6 +1,3 @@
-# アカウントIDを取得するためのリソース
-data "aws_caller_identity" "this" {}
-
 # CloudWatch Logsのロググループを作成するためのリソース
 resource "aws_cloudwatch_log_group" "this" {
   name              = "/aws/lambda/${var.name}"
@@ -11,39 +8,7 @@ resource "aws_cloudwatch_log_group" "this" {
 resource "aws_iam_policy" "this" {
   name        = "terraform-lambda-${var.name}-policy"
   path        = "/"
-
-  policy = jsonencode(
-    {
-      "Statement" : [
-        {
-          "Action" : "logs:CreateLogGroup",
-          "Effect" : "Allow",
-          "Resource" : "arn:aws:logs:ap-northeast-1:${data.aws_caller_identity.this.account_id}:*"
-        },
-        {
-          "Action" : [
-            "logs:CreateLogStream",
-            "logs:PutLogEvents"
-          ],
-          "Effect" : "Allow",
-          "Resource" : [
-            "arn:aws:logs:ap-northeast-1:${data.aws_caller_identity.this.account_id}:log-group:/aws/lambda/${var.name}:*"
-          ]
-        },
-        {
-          "Effect": "Allow",
-          "Action": [
-            "ssm:GetParameter",
-            "ssm:GetParameters"
-          ],
-          "Resource": [
-            "arn:aws:ssm:ap-northeast-1:${data.aws_caller_identity.this.account_id}:parameter/*"
-          ]
-        }
-      ],
-      "Version" : "2012-10-17"
-    }
-  )
+  policy = jsonencode(var.iam_policy)
 }
 
 resource "aws_iam_role" "this" {
@@ -82,5 +47,5 @@ resource "aws_lambda_function" "this" {
   handler          = "${var.function_name}.lambda_handler"
   runtime          = "python3.12"
   source_code_hash = data.archive_file.this.output_base64sha256
-  timeout = 60
+  timeout = var.timeout
 }
