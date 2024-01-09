@@ -51,3 +51,43 @@ module "slack_notification" {
     "Version" : "2012-10-17"
   }
 }
+
+module "vpc_lambda" {
+  source        = "./modules/lambda"
+  name          = "vpc-lambda-test"
+  function_name = "vpc_lambda_test" 
+  timeout       = 60
+  iam_policy = {
+    "Statement" : [
+      {
+        "Action" : "logs:CreateLogGroup",
+        "Effect" : "Allow",
+        "Resource" : "arn:aws:logs:ap-northeast-1:${data.aws_caller_identity.this.account_id}:*"
+      },
+      {
+        "Action" : [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        "Effect" : "Allow",
+        "Resource" : [
+          "arn:aws:logs:ap-northeast-1:${data.aws_caller_identity.this.account_id}:log-group:/aws/lambda/slack-notification:*"
+        ]
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "ssm:GetParameter",
+          "ssm:GetParameters"
+        ],
+        "Resource" : [
+          "arn:aws:ssm:ap-northeast-1:${data.aws_caller_identity.this.account_id}:parameter/*"
+        ]
+      }
+    ],
+    "Version" : "2012-10-17"
+  }
+  in_vpc = true
+  subnet_ids = []
+  security_group_ids = []
+}
