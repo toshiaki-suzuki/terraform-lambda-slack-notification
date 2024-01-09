@@ -48,4 +48,11 @@ resource "aws_lambda_function" "this" {
   runtime          = "python3.12"
   source_code_hash = data.archive_file.this.output_base64sha256
   timeout          = var.timeout
+  dynamic "vpc_config" {
+    for_each = var.in_vpc ? [1] : []
+    content {
+      subnet_ids         = var.subnet_ids
+      security_group_ids = var.security_group_ids
+    }
+  }
 }
