@@ -36,7 +36,7 @@ resource "aws_iam_role" "this" {
 
 data "archive_file" "this" {
   type        = "zip"
-  source_dir  = "src"
+  source_file  = "src/${var.function_name}.py"
   output_path = "zip/${var.name}.zip"
 }
 
