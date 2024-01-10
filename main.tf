@@ -70,7 +70,7 @@ resource "aws_security_group" "vpc_lambda" {
   vpc_id      = data.aws_ssm_parameter.default_vpc_id.value
 
   ingress {
-    from_port        = 0
+    from_port        = 443
     to_port          = 443
     protocol         = "tcp"
     cidr_blocks      = ["0.0.0.0/0"]
