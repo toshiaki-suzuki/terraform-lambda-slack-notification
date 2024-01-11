@@ -62,19 +62,13 @@ module "slack_notification" {
 resource "aws_subnet" "this" {
   vpc_id     = data.aws_ssm_parameter.default_vpc_id.value
   cidr_block = "172.31.48.0/20"
+
 }
 
 resource "aws_security_group" "vpc_lambda" {
   name        = "vpc-lambda-sg"
   description = "For VPC Lambda"
   vpc_id      = data.aws_ssm_parameter.default_vpc_id.value
-
-  ingress {
-    from_port        = 443
-    to_port          = 443
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
-  }
 
   egress {
     from_port        = 0
@@ -104,7 +98,7 @@ module "vpc_lambda" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-          "arn:aws:logs:ap-northeast-1:${data.aws_caller_identity.this.account_id}:log-group:/aws/lambda/slack-notification:*"
+          "arn:aws:logs:ap-northeast-1:${data.aws_caller_identity.this.account_id}:log-group:/aws/lambda/vpc-lambda-test:*"
         ]
       },
       {
