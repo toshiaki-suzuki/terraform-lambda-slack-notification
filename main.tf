@@ -137,6 +137,11 @@ module "stepfunctions" {
         "Action" : "states:*",
         "Effect" : "Allow",
         "Resource" : "*"
+      },
+      {
+        "Action" : "lambda:InvokeFunction",
+        "Effect" : "Allow",
+        "Resource" : "*"
       }
     ],
     "Version" : "2012-10-17"
