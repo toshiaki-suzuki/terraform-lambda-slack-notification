@@ -127,3 +127,48 @@ module "vpc_lambda" {
   subnet_ids = [aws_subnet.this.id]
   security_group_ids = [aws_security_group.vpc_lambda.id]
 }
+
+module "stepfunctions" {
+  source = "./modules/stepfunctions"
+  state_machine_name = "my-stepfunctions"
+  iam_policy = {
+    "Statement" : [
+      {
+        "Action" : "states:*",
+        "Effect" : "Allow",
+        "Resource" : "*"
+      }
+    ],
+    "Version" : "2012-10-17"
+  }
+  definition = <<EOF
+  {
+    "Comment": "ステートマシンの説明",
+    "StartAt": "Lambda Invoke",
+    "States": {
+      "Lambda Invoke": {
+        "Type": "Task",
+        "Resource": "arn:aws:states:::lambda:invoke",
+        "OutputPath": "$.Payload",
+        "Parameters": {
+          "FunctionName": "arn:aws:lambda:ap-northeast-1:543733433886:function:vpc-lambda-test:$LATEST"
+        },
+        "Retry": [
+          {
+            "ErrorEquals": [
+              "Lambda.ServiceException",
+              "Lambda.AWSLambdaException",
+              "Lambda.SdkClientException",
+              "Lambda.TooManyRequestsException"
+            ],
+            "IntervalSeconds": 1,
+            "MaxAttempts": 3,
+            "BackoffRate": 2
+          }
+        ],
+        "End": true
+      }
+    }
+  }
+  EOF
+}
